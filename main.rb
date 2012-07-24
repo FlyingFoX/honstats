@@ -1,13 +1,26 @@
 #!/usr/bin/ruby1.9.1
 require 'nokogiri'
-require 'pry'
 require 'pp'
 require './hero.rb'
 
-heroes_array = ["Armadon","Behemoth","Chronos","Defiler","Devourer","Blacksmith","Slither","Electrician","Nymphora","Glacius","Hammerstorm","Night Hound","Swiftblade","Blood Hunter","Kraken","Thunderbringer","Moon Queen","Pollywog Priest","Pebbles","Soulstealer","Keeper of the Forest","The Dark Lady","Demented Shaman","Voodoo Jester","War Beast","Wildsoul","Zephyr","Pharaoh","Tempest","Ophelia","Moraxus","Magebane","Legionnaire","Predator","Accursed","Nomad","The Madman","Scout","Pyromancer","Puppet Master","Pestilence","Maliken","Arachna","Hellbringer","Torturer","Jeraziah","Andromeda","Valkyrie","Wretched Hag","Succubus","Magmus","Plague Rider","Soul Reaper","Pandamonium","Vindicator","Corrupted Disciple","Sand Wraith","Rampage","Witch Slayer","Forsaken Archer","Engineer","Deadwood","The Chipper","Bubbles","Fayde","Balphagore","Gauntlet","Tundra","The Gladiator","Doctor Repulsor","Tremble","Flint Beastwood","Bombardier","Myrmidon","Dampeer","Empath","Aluna","Silhouette","Flux","Martyr","Amun-Ra","Parasite","Emerald Warden","Revenant","Monkey King","Drunken Master","Master Of Arms","Rhapsody","Geomancer","Midas","Cthulhuphant","Monarch","Gemini","Lord Salforis","Shadowblade","Kinesis","Artesia","Gravekeeper","Berzerker","Draconis","Blitz","Ellonia","Gunblade","Artillery","Riftwalker","Bramble","Ravenor","Prophet"] 
+if ! File.directory? "heroes"
+	Dir.mkdir "heroes"
+end
+update = true
 # get all heroes webpages (assumess there is no hero with a number greater than 300.
-#`curl http://www.heroesofnewerth.com/heroes.php?hero_id=[001-300] -o "heroes/hero_#1.html"`
+case  ARGV[0]
+when "--no_update"
+	update = false
+when "--help", "-h"
+	puts "Usage: #{$0} [--no_update]"
+end
+
+if update
+	`curl http://www.heroesofnewerth.com/heroes.php?hero_id=[001-300] -o "heroes/hero_#1.html"`
+end
+
 heroes_filenames = `ls -1 heroes`.split("\n")
+heroes_array = `grep source heroes/#{heroes_filenames[0]}`.split("source:").last.strip.chop.gsub("[", '').gsub("]",'').gsub('"', '').split(",")
 heroes_zipped = heroes_filenames.zip heroes_array
 heroes_hash = {}
 heroes_zipped.each do |h|
@@ -53,4 +66,4 @@ end
 
 puts "Games played: #{games_played(heroes)}"
 puts "Overall Kills per game: #{kills_per_game(heroes)}"
-puts "Average Game Time: #{avg_game_time(heroes)}"
+puts "Average Game Time: #{avg_game_time(heroes)} minutes"
