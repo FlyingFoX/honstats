@@ -1,0 +1,4 @@
+Requirements:
+curl
+ruby1.9
+nokogiri
