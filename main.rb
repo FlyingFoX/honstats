@@ -32,8 +32,8 @@ def kills_per_game(heroes)
 	kills = heroes.inject(0) do |sum, hero|
 		sum + hero.avg_kills
 	end
-	kills_per_hero_per_game = kills / heroes.count
-	kills_perGame = kills_per_hero_per_game * 10
+	kills_per_hero = kills / heroes.count
+	kills_per_game = kills_per_hero * 10
 end
 
 def games_played(heroes)
@@ -43,5 +43,14 @@ def games_played(heroes)
 	games /= 10
 end
 
+def avg_game_time(heroes)
+	time_played = heroes.inject(0) do |sum, hero|
+		sum + hero.time_played
+	end
+	time_played_per_hero = time_played / heroes.count
+	time_per_game = time_played_per_hero * 10 / games_played(heroes)
+end
+
 puts "Games played: #{games_played(heroes)}"
 puts "Overall Kills per game: #{kills_per_game(heroes)}"
+puts "Average Game Time: #{avg_game_time(heroes)}"
