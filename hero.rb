@@ -1,27 +1,76 @@
 class Hero
-	attr_accessor :name, :matches_played, :time_played, :avg_kills, :avg_deaths, :avg_assists, :wins, :losses, :avg_creep_kills, :avg_creep_denies, :avg_exp_per_min, :avg_gold_per_min, :file_name
+	attr_accessor :file_name, :name
+	attr_reader :matches_played, :time_played, :avg_kills, :avg_deaths, :avg_assists, :wins, :losses, :avg_creep_kills, :avg_creep_denies, :avg_exp_per_min, :avg_gold_per_min, :file_name
+
+	def avg_creep_denies=(value)
+		@avg_creep_denies = value.to_f
+	end
+
+	def avg_creep_kills=(value)
+		@avg_creep_kills = value.to_f
+	end
+
+	def avg_gold_per_min=(value)
+		@avg_gold_per_min = value_to_i(value)
+	end
+
+	def avg_exp_per_min=(value)
+		@avg_exp_per_min = value_to_i(value)
+	end
+
+	def avg_kda=(value)
+		@avg_kills, @avg_deaths, @avg_assists = value_to_kda(value)
+	end
+
+	def avg_kills=(value)
+		@avg_kills = value.to_f
+	end
+
+	def avg_deaths=(value)
+		@avg_deaths = value.to_f
+	end
+
+	def avg_assists=(value)
+		@avg_assists = value.to_f
+	end
+
+	#takes a time in seconds
+	def time_played=(value) 
+		@time_played = value_to_minutes(value)
+	end
+
+	def matches_played=(value)
+		@matches_played = value_to_i(value)
+	end
+
+	def wins=(value)
+		@wins = value_to_i(value)
+	end
+
+	def losses=(value)
+		@losses = value_to_i(value)
+	end
 
 	def add_value(name, value)
 		case name
 		when "Matches Played"
-			@matches_played = value_to_i(value)
+			self.matches_played = value
 		when "Wins"
-			@wins = value_to_i(value)
+			self.wins = value
 		when "Losses"
-			@losses = value_to_i(value)
+			self.losses = value
 		when "Time Played"
-			#in seconds
-			@time_played = value_to_minutes(value)
+			self.time_played = value
 		when "Avg K/D/A"
-			@avg_kills, @avg_deaths, @avg_assists = value_to_kda(value)
+			self.avg_kda = value
 		when "Avg Exp. per Min"
-			@avg_exp_per_min = value_to_i(value)
+			self.avg_exp_per_min = value
 		when "Avg Gold per Min"
-			@avg_gold_per_min = value_to_i(value)
+			self.avg_gold_per_min = value
 		when "Avg Creep Kills"
-			@avg_creep_kills = value.to_f
+			self.avg_creep_kills = value
 		when "Avg Creep Denies"
-			@avg_creep_denies = value.to_f
+			self.avg_creep_denies = value
 		end
 	end
 

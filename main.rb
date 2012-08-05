@@ -1,69 +1,40 @@
 #!/usr/bin/ruby1.9.1
 require 'nokogiri'
 require 'pp'
-require './hero.rb'
+require './main_helper.rb'
+require 'pry'
 
-if ! File.directory? "heroes"
-	Dir.mkdir "heroes"
-end
+
+check_directories
+# process command line options
 update = true
-# get all heroes webpages (assumess there is no hero with a number greater than 300.
+puts ARGV[0]
 case  ARGV[0]
-when "--no_update"
+when "--no-update"
+	puts "... Data will not be updated!"
 	update = false
 when "--help", "-h"
-	puts "Usage: #{$0} [--no_update]"
+	puts "Usage: #{$0} [--no-update]"
+	exit 0
 end
 
+# get all heroes webpages (assumess there is no hero with a number greater than 300.
 if update
 	`curl http://www.heroesofnewerth.com/heroes.php?hero_id=[001-300] -o "heroes/hero_#1.html"`
+	`curl http://stats.dota2.be/herostats/recent -o "#{DOTA2_DIRECTORY}/#{DOTA2_STATS_FILE}"`
 end
 
-heroes_filenames = `ls -1 heroes`.split("\n")
-heroes_array = `grep source heroes/#{heroes_filenames[0]}`.split("source:").last.strip.chop.gsub("[", '').gsub("]",'').gsub('"', '').split(",")
-heroes_zipped = heroes_filenames.zip heroes_array
-heroes_hash = {}
-heroes_zipped.each do |h|
-	heroes_hash[h.first] = h.last
-end
-heroes = []
-heroes_filenames.each do |hero_filename|
-	File.open("heroes/"+hero_filename) do |hero_file|
-		document = Nokogiri::HTML(hero_file)
-		heroes << Hero.new
-		stats = document.css("#usage_stats > p")
-		stats.each do |stat|
-			name, value = stat.content.split(":")
-			heroes.last.add_value(name, value)
-			heroes.last.file_name = hero_filename
-			heroes.last.name = heroes_hash[hero_filename]
-		end
-	end
-end
+heroes = scrape_hon_heroes
+dota_heroes =scrape_dota2_heroes
 
-def kills_per_game(heroes)
-	kills = heroes.inject(0) do |sum, hero|
-		sum + hero.avg_kills
-	end
-	kills_per_hero = kills / heroes.count
-	kills_per_game = kills_per_hero * 10
-end
-
-def games_played(heroes)
-	games = heroes.inject(0) do |sum, hero|
-		sum + hero.matches_played
-	end
-	games /= 10
-end
-
-def avg_game_time(heroes)
-	time_played = heroes.inject(0) do |sum, hero|
-		sum + hero.time_played
-	end
-	time_played_per_hero = time_played / heroes.count
-	time_per_game = time_played_per_hero * 10 / games_played(heroes)
-end
-
+binding.pry
+puts "Heroes of Newerth stats of the last 7 days:"
 puts "Games played: #{games_played(heroes)}"
 puts "Overall Kills per game: #{kills_per_game(heroes)}"
 puts "Average Game Time: #{avg_game_time(heroes)} minutes"
+puts "-"*10
+binding.pry
+puts "DotA2 stats of the last 3 days:"
+puts "Games played: #{games_played(dota_heroes)}"
+puts "Overall Kills per game: #{kills_per_game(dota_heroes)}"
+puts "No average game time currently available."
